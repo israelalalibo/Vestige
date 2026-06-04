@@ -1,8 +1,29 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 
 export default function Footer() {
+  const [email, setEmail] = useState('');
+  const [joined, setJoined] = useState(false);
+
+  const handleNewsletter = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        setJoined(true);
+        setEmail('');
+      }
+    } catch {
+      /* swallow — non-critical */
+    }
+  };
+
   return (
     <footer className="bg-vestige-black text-vestige-white mt-24">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-16">
@@ -47,19 +68,26 @@ export default function Footer() {
           <div>
             <p className="text-xs tracking-widest uppercase mb-5 text-gray-300">Stay in Touch</p>
             <p className="text-gray-400 text-sm mb-4">Early access to new arrivals, restocks, and archive sales.</p>
-            <form className="flex" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="your@email.com"
-                className="flex-1 bg-transparent border border-gray-600 px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-vestige-accent transition-colors"
-              />
-              <button
-                type="submit"
-                className="bg-vestige-accent text-vestige-black px-5 py-2.5 text-xs tracking-widest uppercase font-medium hover:opacity-90 transition-opacity"
-              >
-                Join
-              </button>
-            </form>
+            {joined ? (
+              <p className="text-sm text-vestige-accent">You&apos;re on the list.</p>
+            ) : (
+              <form className="flex" onSubmit={handleNewsletter}>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="flex-1 bg-transparent border border-gray-600 px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-vestige-accent transition-colors"
+                />
+                <button
+                  type="submit"
+                  className="bg-vestige-accent text-vestige-black px-5 py-2.5 text-xs tracking-widest uppercase font-medium hover:opacity-90 transition-opacity"
+                >
+                  Join
+                </button>
+              </form>
+            )}
           </div>
         </div>
 

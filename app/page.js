@@ -2,11 +2,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
 import NewsletterForm from '@/components/NewsletterForm';
-import { getFeaturedProducts, getNewArrivals } from '@/data/products';
+import { getFeaturedProducts, getNewArrivals } from '@/lib/products';
 
-export default function HomePage() {
-  const featured = getFeaturedProducts();
-  const newArrivals = getNewArrivals();
+export const dynamic = 'force-dynamic';
+
+export default async function HomePage() {
+  const [featured, newArrivals] = await Promise.all([
+    getFeaturedProducts(8),
+    getNewArrivals(4),
+  ]);
 
   return (
     <>

@@ -12,8 +12,41 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Promo code
+  const [codeInput, setCodeInput] = useState('');
+  const [coupon, setCoupon] = useState(null); // { code, discountCents }
+  const [couponMsg, setCouponMsg] = useState(null);
+  const [applying, setApplying] = useState(false);
+
+  const discount = coupon ? coupon.discountCents / 100 : 0;
   const shipping = subtotal >= 150 ? 0 : 9.99;
-  const total = subtotal + shipping;
+  const total = Math.max(0, subtotal - discount) + shipping;
+
+  const applyCoupon = async (e) => {
+    e.preventDefault();
+    if (!codeInput.trim()) return;
+    setApplying(true);
+    setCouponMsg(null);
+    try {
+      const res = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: codeInput.trim(), subtotalCents: Math.round(subtotal * 100) }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setCoupon({ code: data.code, discountCents: data.discountCents });
+        setCouponMsg({ type: 'ok', text: `Applied ${data.code}` });
+      } else {
+        setCoupon(null);
+        setCouponMsg({ type: 'err', text: data.error || 'Invalid code' });
+      }
+    } catch {
+      setCouponMsg({ type: 'err', text: 'Could not validate code' });
+    } finally {
+      setApplying(false);
+    }
+  };
 
   const handleCheckout = async () => {
     if (items.length === 0) return;
@@ -24,7 +57,7 @@ export default function CheckoutPage() {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items }),
+        body: JSON.stringify({ items, couponCode: coupon?.code || null }),
       });
 
       const data = await res.json();
@@ -83,6 +116,35 @@ export default function CheckoutPage() {
               <span className="text-vestige-gray">Subtotal</span>
               <span>${subtotal.toFixed(2)}</span>
             </div>
+
+            {/* Promo code */}
+            <form onSubmit={applyCoupon} className="flex gap-2">
+              <input
+                type="text"
+                value={codeInput}
+                onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
+                placeholder="Promo code"
+                className="flex-1 border border-gray-300 px-3 py-2 text-xs uppercase tracking-wide focus:outline-none focus:border-vestige-black"
+              />
+              <button
+                type="submit"
+                disabled={applying}
+                className="px-4 py-2 text-xs tracking-widest uppercase border border-vestige-black hover:bg-vestige-black hover:text-white transition-colors disabled:opacity-50"
+              >
+                {applying ? '…' : 'Apply'}
+              </button>
+            </form>
+            {couponMsg && (
+              <p className={`text-xs ${couponMsg.type === 'ok' ? 'text-green-600' : 'text-red-500'}`}>{couponMsg.text}</p>
+            )}
+
+            {discount > 0 && (
+              <div className="flex justify-between text-sm text-green-600">
+                <span>Discount ({coupon.code})</span>
+                <span>−${discount.toFixed(2)}</span>
+              </div>
+            )}
+
             <div className="flex justify-between text-sm">
               <span className="text-vestige-gray">Shipping</span>
               <span>{shipping === 0 ? <span className="text-green-600">Free</span> : `$${shipping.toFixed(2)}`}</span>

@@ -1,7 +1,7 @@
 import './globals.css';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import AuthSessionProvider from '@/components/SessionProvider';
 import CartProvider from '@/context/CartContext';
+import Chrome from '@/components/Chrome';
 
 export const metadata = {
   title: 'Vestige — Clothing',
@@ -12,11 +12,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <CartProvider>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-        </CartProvider>
+        <AuthSessionProvider>
+          <CartProvider>
+            <Chrome>{children}</Chrome>
+          </CartProvider>
+        </AuthSessionProvider>
       </body>
     </html>
   );

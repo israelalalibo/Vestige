@@ -1,118 +1,136 @@
-# Vestige — Deploy Guide
+# Vestige — Setup & Deploy Guide
 
-## The #1 reason pushing to GitHub fails
-
-When you create a repo on GitHub **with a README** (or any file), GitHub makes an initial commit.
-Your local project also has commits. Git sees these as **unrelated histories** and rejects your push.
-
-**Fix:** Always create your GitHub repo completely empty — no README, no .gitignore, no license file.
+Vestige is now a **full-stack e-commerce platform**: PostgreSQL database (Prisma), customer + admin auth (NextAuth), persisted orders, inventory, discounts, reviews, search, wishlist, newsletter, and an admin dashboard at `/admin`.
 
 ---
 
 ## Step 1 — Install dependencies
 
-Open a terminal in your `C:\Vestige` folder:
-
 ```bash
 npm install
 ```
 
+This also runs `prisma generate` automatically (via the `postinstall` script).
+
 ---
 
-## Step 2 — Set up your environment variables
+## Step 2 — Create a PostgreSQL database (required)
 
-Copy the example file and fill in your Stripe keys:
+Pick one free hosted option and copy its **connection string**:
+
+- **Neon** — https://neon.tech (recommended; serverless Postgres, great with Vercel)
+- **Supabase** — https://supabase.com (Project → Settings → Database → Connection string)
+
+You'll paste this into `DATABASE_URL` next.
+
+---
+
+## Step 3 — Environment variables
 
 ```bash
 copy .env.local.example .env.local
 ```
 
-Edit `.env.local`:
+Fill in `.env.local`:
 
 ```
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_YOUR_KEY_HERE
-STRIPE_SECRET_KEY=sk_test_YOUR_KEY_HERE
+# Database — from Neon/Supabase
+DATABASE_URL="postgresql://USER:PASSWORD@HOST/DBNAME?sslmode=require"
+
+# Auth — generate a secret:  openssl rand -base64 32   (or any long random string)
+NEXTAUTH_SECRET="your-long-random-string"
+NEXTAUTH_URL="http://localhost:3000"
+
+# Seed admin login (used by the seed script)
+ADMIN_EMAIL="admin@vestige.com"
+ADMIN_PASSWORD="admin12345"
+
+# Stripe — https://dashboard.stripe.com/apikeys
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...        # from `stripe listen` (Step 6)
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
+
+# Google sign-in (optional)
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
 ```
 
-Get your Stripe test keys at: https://dashboard.stripe.com/apikeys
+### Google OAuth (optional)
+1. https://console.cloud.google.com/apis/credentials → **Create credentials → OAuth client ID → Web application**
+2. Authorized redirect URI: `http://localhost:3000/api/auth/callback/google` (add your production URL too)
+3. Paste the client ID/secret into `.env.local`. If left blank, the Google button simply won't be active.
 
 ---
 
-## Step 3 — Run locally
+## Step 4 — Create the schema & seed data
+
+```bash
+npx prisma migrate dev --name init   # creates all tables
+npm run db:seed                      # loads 8 products, variants, admin user, coupons, sample orders
+```
+
+Inspect anytime with:
+
+```bash
+npm run db:studio
+```
+
+Seeded logins:
+- **Admin** → the `ADMIN_EMAIL` / `ADMIN_PASSWORD` you set (default `admin@vestige.com` / `admin12345`)
+- **Demo customer** → `demo@vestige.com` / `password123`
+- **Coupons** → `WELCOME10` (10% off), `VESTIGE20` (20% off over $150), `FREESHIP` ($10 off over $50)
+
+---
+
+## Step 5 — Run locally
 
 ```bash
 npm run dev
 ```
 
-Visit http://localhost:3000 — your store should be live.
+- Storefront: http://localhost:3000
+- Admin dashboard: http://localhost:3000/admin (sign in with the admin account)
 
 ---
 
-## Step 4 — Create the GitHub repo (EMPTY)
+## Step 6 — Stripe webhook (for order fulfillment)
 
-1. Go to https://github.com/new
-2. Name it `vestige` (or whatever you like)
-3. **Leave everything unchecked** — no README, no .gitignore, no license
-4. Click **Create repository**
-5. Copy the repo URL (e.g. `https://github.com/YOUR_USERNAME/vestige.git`)
-
----
-
-## Step 5 — Push your code
-
-In your terminal (inside the Vestige folder):
+Orders are only marked **PAID** (and stock decremented) when Stripe confirms payment via webhook. Locally, install the [Stripe CLI](https://docs.stripe.com/stripe-cli) and run:
 
 ```bash
-git init
-git add .
-git commit -m "initial commit"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/vestige.git
-git push -u origin main
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
 ```
 
-That's it. Your code is on GitHub.
+Copy the `whsec_...` it prints into `STRIPE_WEBHOOK_SECRET`, then restart `npm run dev`. Test card: `4242 4242 4242 4242`, any future expiry/CVC.
 
 ---
 
-## Step 6 — Deploy to Vercel
+## Step 7 — Deploy to Vercel
 
-1. Go to https://vercel.com and sign in with GitHub
-2. Click **Add New → Project**
-3. Import your `vestige` repo
-4. Vercel auto-detects Next.js — no build config needed
-5. Before clicking Deploy, go to **Environment Variables** and add:
-   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` → your Stripe publishable key
-   - `STRIPE_SECRET_KEY` → your Stripe secret key
-   - `NEXT_PUBLIC_BASE_URL` → your Vercel URL (e.g. `https://vestige.vercel.app`)
-6. Click **Deploy**
+1. Push to GitHub (create the repo **empty** — no README/.gitignore/license — to avoid unrelated-history push errors):
+   ```bash
+   git init
+   git add .
+   git commit -m "full-stack vestige"
+   git branch -M main
+   git remote add origin https://github.com/YOUR_USERNAME/vestige.git
+   git push -u origin main
+   ```
+2. Import the repo at https://vercel.com → **Add New → Project**.
+3. Add **all** the environment variables from `.env.local` (use the Neon/Supabase URL, set `NEXTAUTH_URL` and `NEXT_PUBLIC_BASE_URL` to your Vercel domain).
+4. In the Stripe dashboard, create a webhook endpoint pointing at `https://YOUR_DOMAIN/api/webhooks/stripe` (event `checkout.session.completed`) and put its signing secret in `STRIPE_WEBHOOK_SECRET`.
+5. Deploy. The `build` script runs `prisma generate` automatically. Run `npx prisma migrate deploy` against the production DB (Vercel can do this via a build step or run it once locally pointed at the prod `DATABASE_URL`).
 
-Your site will be live at `https://vestige.vercel.app` (or your custom domain).
-
----
-
-## Step 7 — Every future update
-
-After making changes:
-
-```bash
-git add .
-git commit -m "describe what you changed"
-git push
-```
-
-Vercel automatically redeploys on every push to `main`. No extra steps.
+Every future `git push` to `main` redeploys automatically.
 
 ---
 
 ## Going live with real payments
 
-When you're ready to accept real money:
-1. In your Stripe dashboard, switch from Test to Live mode
-2. Replace the test keys in your Vercel environment variables with live keys
-3. Update `NEXT_PUBLIC_BASE_URL` to your real domain
-4. Redeploy
+1. Switch Stripe from Test to Live mode; replace the keys in Vercel.
+2. Update the live webhook signing secret.
+3. Update `NEXT_PUBLIC_BASE_URL` / `NEXTAUTH_URL` to your real domain and redeploy.
 
 ---
 
@@ -120,7 +138,9 @@ When you're ready to accept real money:
 
 | Error | Cause | Fix |
 |---|---|---|
-| `rejected — non-fast-forward` | Repo wasn't empty when created | Delete the remote repo and create a new empty one, or run `git pull origin main --allow-unrelated-histories` then push again |
-| `src refspec main does not match any` | No commits yet | Run `git add . && git commit -m "init"` first |
-| `Stripe publishable key is missing` | .env.local not set up | Add your keys to .env.local (local) or Vercel env vars (production) |
-| `Module not found` | Dependencies not installed | Run `npm install` |
+| `Environment variable not found: DATABASE_URL` | `.env.local` missing/blank | Add your Neon/Supabase connection string |
+| `Can't reach database server` | Wrong URL or DB asleep | Re-copy the connection string; Neon free tier may need a moment to wake |
+| `PrismaClientInitializationError` on Vercel | Migrations not applied to prod DB | Run `npx prisma migrate deploy` against the production `DATABASE_URL` |
+| Orders stay `PENDING` | Webhook not running/secret wrong | Run `stripe listen …` locally; set the correct `STRIPE_WEBHOOK_SECRET` |
+| Google button does nothing | OAuth creds blank | Add `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` |
+| `module-not-found` | Deps not installed | `npm install` |

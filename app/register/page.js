@@ -2,11 +2,9 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function RegisterPage() {
-  const router = useRouter();
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -26,10 +24,9 @@ export default function RegisterPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Registration failed');
 
-      // Auto sign-in after registering.
+      // Auto sign-in after registering, then full reload so the session is live everywhere.
       await signIn('credentials', { email: form.email, password: form.password, redirect: false });
-      router.push('/account');
-      router.refresh();
+      window.location.assign('/account');
     } catch (err) {
       setError(err.message);
       setLoading(false);

@@ -2,11 +2,10 @@
 
 import { useState, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/account';
 
@@ -20,13 +19,14 @@ function LoginForm() {
     setError(null);
     setLoading(true);
     const res = await signIn('credentials', { email, password, redirect: false });
-    setLoading(false);
     if (res?.error) {
       setError('Invalid email or password');
+      setLoading(false);
       return;
     }
-    router.push(callbackUrl);
-    router.refresh();
+    // Full reload so the session cookie is picked up by useSession everywhere
+    // (a soft client navigation can leave the navbar showing the logged-out state).
+    window.location.assign(callbackUrl);
   };
 
   return (

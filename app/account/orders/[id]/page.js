@@ -5,6 +5,7 @@ import { getCurrentUser } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import { formatCents } from '@/lib/money';
 import OrderStatusBadge from '@/components/OrderStatusBadge';
+import CompleteOrderButton from '@/components/CompleteOrderButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,6 +37,17 @@ export default async function OrderDetailPage({ params }) {
         </div>
         <OrderStatusBadge status={order.status} />
       </div>
+
+      {/* Awaiting payment — let the customer complete checkout */}
+      {order.status === 'PENDING' && (
+        <div className="mb-10 border border-amber-200 bg-amber-50 rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium text-amber-900">This order is awaiting payment</p>
+            <p className="text-xs text-amber-800 mt-0.5">Complete checkout to confirm your order — total {formatCents(order.totalCents)}.</p>
+          </div>
+          <CompleteOrderButton orderId={order.id} />
+        </div>
+      )}
 
       {/* Tracking timeline */}
       {!['CANCELLED', 'REFUNDED'].includes(order.status) && currentStep >= 0 && (

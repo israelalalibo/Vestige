@@ -18,7 +18,7 @@ const catalog = [
     description: 'Garment-dyed in a 400gsm French terry blend. The slightly oversized fit and dropped shoulders make this the hoodie you never want to take off. Kangaroo pocket, ribbed cuffs.',
     details: ['400gsm French terry (80% cotton, 20% polyester)', 'Garment-dyed finish', 'Oversized fit, dropped shoulders', 'Kangaroo pocket', 'Machine wash cold inside out'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'], colors: ['Carbon Black', 'Vintage Cream', 'Stone', 'Forest'],
-    images: ['https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=800&q=80', 'https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=800&q=80'],
+    images: ['https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=800&q=80', 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&q=80'],
     featured: true, isNew: true,
   },
   {
@@ -58,7 +58,7 @@ const catalog = [
     description: 'Mid-thigh length cargo shorts in a washed canvas twill. Double-knee panels and multiple utility pockets. A summer staple built for real wear.',
     details: ['100% washed canvas twill', 'Relaxed fit, mid-thigh length', 'Multiple cargo pockets', 'Elasticated waistband + drawcord', 'Machine wash cold'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'], colors: ['Washed Black', 'Sand', 'Olive'],
-    images: ['https://images.unsplash.com/photo-1594938298603-c8148c4b4057?w=800&q=80'],
+    images: ['https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=800&q=80', 'https://images.unsplash.com/photo-1517445312882-bc9910d016b7?w=800&q=80'],
     featured: false, isNew: false,
   },
   {

@@ -8,9 +8,10 @@ import Footer from '@/components/Footer';
 // admin dashboard, which has its own layout.
 export default function Chrome({ children }) {
   const pathname = usePathname();
-  const isAdmin = pathname?.startsWith('/admin');
+  // The admin dashboard and the pre-launch gate render without storefront chrome.
+  const bare = pathname?.startsWith('/admin') || pathname === '/coming-soon';
 
-  if (isAdmin) return <>{children}</>;
+  if (bare) return <>{children}</>;
 
   return (
     <>

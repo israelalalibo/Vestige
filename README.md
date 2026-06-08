@@ -1,5 +1,14 @@
 # Vestige — Full-Stack E-Commerce Platform
 
+![Next.js](https://img.shields.io/badge/Next.js_14-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![Stripe](https://img.shields.io/badge/Stripe-635BFF?style=for-the-badge&logo=stripe&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-3da639?style=for-the-badge)
+
 Vestige is a production-grade e-commerce platform for a streetwear clothing brand, built from the ground up with the Next.js App Router. It pairs a polished, mobile-first storefront with a complete commerce backend — authentication, a real database, payments, inventory, discounts, reviews, and a metrics-driven admin dashboard.
 
 > Built as a full-stack engineering project: a real database, role-based auth, Stripe payments with webhook fulfillment, and an admin panel — not a template or a no-code store.
@@ -12,17 +21,17 @@ Vestige is a production-grade e-commerce platform for a streetwear clothing bran
 
 ## Screenshots
 
-> Screenshots live in [`docs/screenshots/`](docs/screenshots/). Once the images listed there are added, uncomment the block below to display them.
-
-<!--
 <p align="center">
-  <img src="docs/screenshots/home.png" alt="Vestige storefront" width="100%" />
+  <img src="docs/screenshots/home.png" alt="Vestige storefront landing page" width="100%" />
 </p>
 
-| Products | Product detail | Admin dashboard |
-|---|---|---|
-| <img src="docs/screenshots/products.png" alt="Product listing" /> | <img src="docs/screenshots/product.png" alt="Product detail" /> | <img src="docs/screenshots/admin-dashboard.png" alt="Admin dashboard" /> |
--->
+<p align="center">
+  <img src="docs/screenshots/products.png" alt="Product listing with search and filters" width="32%" />
+  &nbsp;
+  <img src="docs/screenshots/product.png" alt="Product detail page" width="32%" />
+  &nbsp;
+  <img src="docs/screenshots/admin-dashboard.png" alt="Admin dashboard with KPIs and charts" width="32%" />
+</p>
 
 
 ## Tech Stack

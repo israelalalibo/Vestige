@@ -10,6 +10,21 @@ Vestige is a production-grade e-commerce platform for a streetwear clothing bran
 
 > The site is currently behind a pre-launch passcode gate. Use the access code provided in the application or contact me for early-access credentials.
 
+## Screenshots
+
+> Screenshots live in [`docs/screenshots/`](docs/screenshots/). Once the images listed there are added, uncomment the block below to display them.
+
+<!--
+<p align="center">
+  <img src="docs/screenshots/home.png" alt="Vestige storefront" width="100%" />
+</p>
+
+| Products | Product detail | Admin dashboard |
+|---|---|---|
+| <img src="docs/screenshots/products.png" alt="Product listing" /> | <img src="docs/screenshots/product.png" alt="Product detail" /> | <img src="docs/screenshots/admin-dashboard.png" alt="Admin dashboard" /> |
+-->
+
+
 ## Tech Stack
 
 | Layer | Technology |
@@ -51,6 +66,35 @@ Vestige is a production-grade e-commerce platform for a streetwear clothing bran
 - A configurable **pre-launch passcode gate** (middleware-enforced) that can be switched off at launch via a single environment variable
 
 ## Architecture Highlights
+
+```mermaid
+flowchart TD
+    subgraph Client["Browser"]
+        SF["Storefront"]
+        AD["Admin Dashboard"]
+    end
+
+    subgraph App["Next.js 14 on Vercel"]
+        MW["Middleware<br/>launch gate + role-based access"]
+        RSC["Server Components"]
+        API["Route Handlers (/api)"]
+    end
+
+    AUTH["NextAuth<br/>credentials + Google, JWT"]
+    DB[("PostgreSQL<br/>Supabase")]
+    STRIPE["Stripe Checkout"]
+
+    SF --> MW
+    AD --> MW
+    MW --> RSC
+    MW --> API
+    RSC --> DB
+    API --> DB
+    API --> AUTH
+    API -->|create session| STRIPE
+    STRIPE -->|webhook: payment succeeded| API
+    API -->|mark paid · decrement stock · log coupon use| DB
+```
 
 - **Server Components** fetch data directly from PostgreSQL via Prisma; interactive pieces (cart, filters, reviews, admin forms) are isolated client components.
 - **Money is stored as integer cents** throughout to avoid floating-point errors, with a single formatting utility.
@@ -111,4 +155,4 @@ See [`.env.local.example`](.env.local.example) for the full list — database co
 
 ## License
 
-This project is for portfolio and demonstration purposes.
+Released under the [MIT License](LICENSE).

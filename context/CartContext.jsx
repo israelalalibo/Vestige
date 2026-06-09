@@ -147,7 +147,21 @@ export default function CartProvider({ children }) {
   const itemCount = state.items.reduce((sum, i) => sum + i.quantity, 0);
   const subtotal = state.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
-  const addItem = (item) => dispatch({ type: 'ADD_ITEM', item });
+  const addItem = (item) => {
+    dispatch({ type: 'ADD_ITEM', item });
+    // Fire-and-forget analytics event (used for the daily abandoned-cart rollup).
+    fetch('/api/track/cart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        productId: item.id,
+        name: item.name,
+        priceCents: Math.round((item.price || 0) * 100),
+        quantity: item.quantity || 1,
+      }),
+      keepalive: true,
+    }).catch(() => {});
+  };
   const removeItem = (id, size, color) => dispatch({ type: 'REMOVE_ITEM', id, size, color });
   const updateQuantity = (id, size, color, quantity) =>
     dispatch({ type: 'UPDATE_QUANTITY', id, size, color, quantity });

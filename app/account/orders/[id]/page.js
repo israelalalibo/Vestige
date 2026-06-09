@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { formatCents } from '@/lib/money';
 import OrderStatusBadge from '@/components/OrderStatusBadge';
 import CompleteOrderButton from '@/components/CompleteOrderButton';
+import ReturnRequestForm from '@/components/ReturnRequestForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +18,7 @@ export default async function OrderDetailPage({ params }) {
 
   const order = await prisma.order.findUnique({
     where: { id: params.id },
-    include: { items: true },
+    include: { items: true, returns: { orderBy: { createdAt: 'desc' } } },
   });
 
   if (!order || order.userId !== user.id) notFound();
@@ -47,6 +48,11 @@ export default async function OrderDetailPage({ params }) {
           </div>
           <CompleteOrderButton orderId={order.id} />
         </div>
+      )}
+
+      {/* Returns — available once delivered */}
+      {(order.status === 'DELIVERED' || order.returns.length > 0) && (
+        <ReturnRequestForm orderId={order.id} existingReturn={order.returns[0] || null} />
       )}
 
       {/* Tracking timeline */}

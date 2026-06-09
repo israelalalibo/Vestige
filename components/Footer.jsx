@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Logo from './Logo';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -30,7 +31,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="md:col-span-1">
-            <p className="font-display text-2xl font-light tracking-[0.2em] uppercase mb-4">Vestige</p>
+            <Logo tone="dark" className="h-9 w-auto mb-4" />
             <p className="text-gray-400 text-sm leading-relaxed">
               Timeless pieces for the modern wardrobe. Designed with intention, made to last.
             </p>

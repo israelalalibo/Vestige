@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/session';
 import { evaluateCoupon } from '@/lib/coupon';
+import { getVisitorId } from '@/lib/tracking';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2024-04-10',
@@ -100,6 +101,7 @@ export async function POST(request) {
         discountCents,
         totalCents,
         couponCode: appliedCode,
+        trackingId: getVisitorId(),
         items: { create: orderItems },
       },
     });

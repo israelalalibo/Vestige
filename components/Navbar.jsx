@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import { useCart } from '@/context/CartContext';
 import CartDrawer from './CartDrawer';
 import AccountMenu from './AccountMenu';
+import Logo from './Logo';
 
 export default function Navbar() {
   const { itemCount, toggleCart } = useCart();
@@ -62,7 +63,9 @@ export default function Navbar() {
             </nav>
 
             {/* Logo */}
-            <Link href="/" className="font-display text-2xl lg:text-3xl font-light tracking-[0.2em] uppercase">Vestige</Link>
+            <Link href="/" aria-label="Vestige — home">
+              <Logo tone="light" className="h-7 lg:h-9 w-auto" priority />
+            </Link>
 
             {/* Right icons */}
             <div className="flex items-center gap-5">

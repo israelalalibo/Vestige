@@ -196,6 +196,63 @@ async function main() {
     console.log('  ✓ 28 sample orders for dashboard metrics');
   }
 
+  // ---- Backfill shipping locations (for the buyer-location panel) + deliver some ----
+  const locs = [
+    { country: 'United States', state: 'NY', city: 'New York', postal_code: '10001' },
+    { country: 'United Kingdom', state: 'England', city: 'London', postal_code: 'EC1A' },
+    { country: 'Canada', state: 'ON', city: 'Toronto', postal_code: 'M5H' },
+    { country: 'Australia', state: 'NSW', city: 'Sydney', postal_code: '2000' },
+    { country: 'Germany', state: 'BE', city: 'Berlin', postal_code: '10115' },
+    { country: 'United States', state: 'CA', city: 'Los Angeles', postal_code: '90001' },
+  ];
+  const allOrders = await prisma.order.findMany({ select: { id: true, shippingAddress: true, status: true } });
+  let li = 0;
+  for (const o of allOrders) {
+    const loc = locs[li % locs.length];
+    const data = {};
+    if (!o.shippingAddress) {
+      data.shippingAddress = { line1: `${100 + li} High Street`, city: loc.city, state: loc.state, postal_code: loc.postal_code, country: loc.country };
+      data.shippingName = 'Sample Buyer';
+    }
+    if (o.status === 'PAID' && li % 5 < 2) data.status = 'DELIVERED';
+    if (Object.keys(data).length) await prisma.order.update({ where: { id: o.id }, data });
+    li++;
+  }
+  console.log('  ✓ shipping locations backfilled');
+
+  // ---- Sample returns (on the demo customer's delivered orders) ----
+  const custOrders = await prisma.order.findMany({ where: { userId: customer.id }, orderBy: { createdAt: 'desc' }, take: 3 });
+  if (custOrders.length) {
+    await prisma.order.updateMany({ where: { id: { in: custOrders.map((o) => o.id) } }, data: { status: 'DELIVERED' } });
+    if ((await prisma.returnRequest.count()) === 0) {
+      await prisma.returnRequest.create({ data: { orderId: custOrders[0].id, userId: customer.id, reason: 'Sizing ran small', status: 'REFUNDED' } });
+      if (custOrders[1]) await prisma.returnRequest.create({ data: { orderId: custOrders[1].id, userId: customer.id, reason: 'Changed my mind', status: 'REQUESTED' } });
+      console.log('  ✓ sample return requests');
+    }
+  }
+
+  // ---- 30 days of analytics rollups (so the dashboard is populated) ----
+  if ((await prisma.dailyStat.count()) === 0) {
+    const t = new Date();
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate()) - i * 86400000);
+      const visits = 80 + Math.floor(Math.random() * 320);
+      const uniqueVisitors = Math.floor(visits * (0.55 + Math.random() * 0.2));
+      const addToCarts = Math.floor(uniqueVisitors * (0.15 + Math.random() * 0.15));
+      const abandonedItems = Math.floor(addToCarts * (0.4 + Math.random() * 0.4));
+      const abandonedRevenueCents = abandonedItems * (4000 + Math.floor(Math.random() * 8000));
+      const orders = Math.max(0, Math.floor(addToCarts * (0.1 + Math.random() * 0.15)));
+      const revenueCents = orders * (6000 + Math.floor(Math.random() * 10000));
+      const returns = Math.random() < 0.18 ? 1 : 0;
+      await prisma.dailyStat.upsert({
+        where: { date },
+        update: {},
+        create: { date, visits, uniqueVisitors, addToCarts, abandonedItems, abandonedRevenueCents, orders, revenueCents, returns },
+      });
+    }
+    console.log('  ✓ 30 days of analytics stats');
+  }
+
   console.log('Done.');
 }
 

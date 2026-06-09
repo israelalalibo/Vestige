@@ -2,6 +2,7 @@ import './globals.css';
 import AuthSessionProvider from '@/components/SessionProvider';
 import CartProvider from '@/context/CartContext';
 import Chrome from '@/components/Chrome';
+import VisitTracker from '@/components/VisitTracker';
 
 export const metadata = {
   title: 'Vestige — Clothing',
@@ -14,6 +15,7 @@ export default function RootLayout({ children }) {
       <body>
         <AuthSessionProvider>
           <CartProvider>
+            <VisitTracker />
             <Chrome>{children}</Chrome>
           </CartProvider>
         </AuthSessionProvider>

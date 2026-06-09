@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import PasscodeForm from '@/components/PasscodeForm';
 import NewsletterForm from '@/components/NewsletterForm';
+import Logo from '@/components/Logo';
 
 export const metadata = {
   title: 'Vestige — Launching Soon',
@@ -21,8 +22,8 @@ export default function ComingSoonPage() {
       <div className="absolute inset-0 -z-10 bg-black/70" />
 
       <div className="max-w-lg w-full">
-        <p className="text-[10px] tracking-[0.35em] uppercase mb-4 opacity-70">Drop 01 — Coming Soon</p>
-        <h1 className="font-display text-6xl sm:text-7xl font-light tracking-[0.15em] uppercase mb-5">Vestige</h1>
+        <p className="text-[10px] tracking-[0.35em] uppercase mb-6 opacity-70">Drop 01 — Coming Soon</p>
+        <Logo tone="dark" className="h-20 sm:h-24 w-auto mx-auto mb-6" priority />
         <p className="text-sm opacity-80 leading-relaxed max-w-sm mx-auto mb-2">
           Premium streetwear designed to outlast every season.
         </p>

@@ -4,6 +4,7 @@ import { formatCents } from '@/lib/money';
 import StatCard from '@/components/admin/StatCard';
 import { RevenueChart, OrdersChart } from '@/components/admin/DashboardCharts';
 import OrderStatusBadge from '@/components/OrderStatusBadge';
+import { getDailyStats, getReturnRate } from '@/lib/analytics';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,6 +40,11 @@ export default async function AdminOverview() {
       take: 5,
     }),
   ]);
+
+  // Operational analytics (from the daily rollup).
+  const [dailyStats, returnRate] = await Promise.all([getDailyStats(30), getReturnRate()]);
+  const visits30 = dailyStats.reduce((s, d) => s + d.visits, 0);
+  const abandonedRevenue30 = dailyStats.reduce((s, d) => s + d.abandonedRevenueCents, 0);
 
   const totalRevenue = revenueAgg._sum.totalCents || 0;
   const orderCount = revenueAgg._count || 0;
@@ -77,6 +83,19 @@ export default async function AdminOverview() {
         <StatCard label="Paid Orders" value={orderCount} sub={`${paidOrders.length} last 30d`} />
         <StatCard label="Avg. Order Value" value={formatCents(aov)} />
         <StatCard label="Customers" value={customerCount} />
+      </div>
+
+      {/* Operations (analytics rollup) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <Link href="/admin/analytics" className="block hover:opacity-90 transition-opacity">
+          <StatCard label="Visits (30d)" value={visits30.toLocaleString()} sub="View analytics →" />
+        </Link>
+        <Link href="/admin/analytics" className="block hover:opacity-90 transition-opacity">
+          <StatCard label="Abandoned Revenue (30d)" value={formatCents(abandonedRevenue30)} sub="Potential, uncaptured" />
+        </Link>
+        <Link href="/admin/returns" className="block hover:opacity-90 transition-opacity">
+          <StatCard label="Return Rate" value={`${(returnRate.rate * 100).toFixed(1)}%`} sub="Manage returns →" />
+        </Link>
       </div>
 
       {/* Charts */}

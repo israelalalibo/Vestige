@@ -3,11 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import SignOutButton from '@/components/SignOutButton';
+import Logo from '@/components/Logo';
 
 const NAV = [
   { href: '/admin', label: 'Overview', exact: true },
+  { href: '/admin/analytics', label: 'Analytics' },
   { href: '/admin/products', label: 'Products' },
   { href: '/admin/orders', label: 'Orders' },
+  { href: '/admin/returns', label: 'Returns' },
   { href: '/admin/reviews', label: 'Reviews' },
   { href: '/admin/coupons', label: 'Coupons' },
   { href: '/admin/customers', label: 'Customers' },
@@ -20,8 +23,8 @@ export default function Sidebar() {
   return (
     <aside className="w-60 flex-shrink-0 bg-vestige-black text-white min-h-screen flex flex-col fixed lg:static inset-y-0 left-0 z-40">
       <div className="px-6 py-6 border-b border-white/10">
-        <Link href="/" className="font-display text-xl font-light tracking-[0.2em] uppercase">Vestige</Link>
-        <p className="text-[10px] tracking-widest uppercase text-gray-500 mt-1">Admin</p>
+        <Link href="/" aria-label="Vestige — home"><Logo tone="dark" className="h-7 w-auto" /></Link>
+        <p className="text-[10px] tracking-widest uppercase text-gray-500 mt-2">Admin</p>
       </div>
 
       <nav className="flex-1 py-4">

@@ -18,7 +18,8 @@ function isAllowedWhileLocked(pathname) {
     pathname === '/coming-soon' ||
     pathname.startsWith('/api/unlock') ||
     pathname.startsWith('/api/auth') ||
-    pathname.startsWith('/api/newsletter')
+    pathname.startsWith('/api/newsletter') ||
+    pathname.startsWith('/api/cron')
   );
 }
 

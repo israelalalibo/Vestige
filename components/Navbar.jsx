@@ -64,7 +64,7 @@ export default function Navbar() {
 
             {/* Logo */}
             <Link href="/" aria-label="Vestige — home">
-              <Logo tone="light" className="h-7 lg:h-9 w-auto" priority />
+              <Logo tone="light" className="h-11 lg:h-14 w-auto" priority />
             </Link>
 
             {/* Right icons */}

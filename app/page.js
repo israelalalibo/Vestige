@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
 import NewsletterForm from '@/components/NewsletterForm';
+import InstagramIcon, { INSTAGRAM_URL } from '@/components/InstagramIcon';
 import { getFeaturedProducts, getNewArrivals } from '@/lib/products';
 
 export const dynamic = 'force-dynamic';
@@ -160,7 +161,10 @@ export default async function HomePage() {
       {/* Instagram social proof */}
       <section className="max-w-7xl mx-auto px-6 lg:px-12 py-12 text-center">
         <p className="text-[10px] tracking-widest uppercase text-vestige-gray mb-2">Community</p>
-        <h2 className="font-display text-3xl font-light mb-2">@vestigeofficial</h2>
+        <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 font-display text-3xl font-light mb-2 hover:text-vestige-accent transition-colors">
+          <InstagramIcon className="w-6 h-6" />
+          @vestige.xyz
+        </a>
         <p className="text-sm text-vestige-gray mb-8">Tag us to be featured</p>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-1.5">
           {[
@@ -177,11 +181,12 @@ export default async function HomePage() {
           ))}
         </div>
         <a
-          href="https://instagram.com"
+          href={INSTAGRAM_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block mt-8 text-xs tracking-widest uppercase border-b border-vestige-black pb-0.5 hover:text-vestige-accent hover:border-vestige-accent transition-colors"
+          className="inline-flex items-center gap-2 mt-8 text-xs tracking-widest uppercase border-b border-vestige-black pb-0.5 hover:text-vestige-accent hover:border-vestige-accent transition-colors"
         >
+          <InstagramIcon className="w-4 h-4" />
           Follow on Instagram
         </a>
       </section>

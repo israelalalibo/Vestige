@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Logo from './Logo';
+import InstagramIcon, { INSTAGRAM_URL } from './InstagramIcon';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -35,6 +36,16 @@ export default function Footer() {
             <p className="text-gray-400 text-sm leading-relaxed">
               Timeless pieces for the modern wardrobe. Designed with intention, made to last.
             </p>
+            <a
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Vestige on Instagram"
+              className="inline-flex items-center gap-2 mt-5 text-gray-400 hover:text-vestige-white transition-colors"
+            >
+              <InstagramIcon className="w-5 h-5" />
+              <span className="text-sm">@vestige.xyz</span>
+            </a>
           </div>
 
           {/* Shop */}
@@ -97,7 +108,7 @@ export default function Footer() {
           <div className="flex gap-6">
             <Link href="#" className="hover:text-gray-300 transition-colors">Privacy</Link>
             <Link href="#" className="hover:text-gray-300 transition-colors">Terms</Link>
-            <Link href="#" className="hover:text-gray-300 transition-colors">Instagram</Link>
+            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 transition-colors">Instagram</a>
           </div>
         </div>
       </div>

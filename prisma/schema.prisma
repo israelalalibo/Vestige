@@ -227,6 +227,16 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique // sha-256 hash of the token sent by email
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
 // ---- Analytics & operations ----
 
 enum ReturnStatus {

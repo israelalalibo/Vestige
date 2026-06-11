@@ -73,6 +73,12 @@ function LoginForm() {
           </button>
         </form>
 
+        <p className="text-center mt-4">
+          <Link href="/forgot-password" className="text-xs tracking-widest uppercase text-vestige-gray hover:text-vestige-black transition-colors">
+            Forgot password?
+          </Link>
+        </p>
+
         <p className="text-center text-sm text-vestige-gray mt-6">
           No account?{' '}
           <Link href="/register" className="text-vestige-black underline hover:text-vestige-accent">Create one</Link>

@@ -16,6 +16,8 @@ function gateEnabled() {
 function isAllowedWhileLocked(pathname) {
   return (
     pathname === '/coming-soon' ||
+    pathname === '/forgot-password' ||
+    pathname === '/reset-password' ||
     pathname.startsWith('/api/unlock') ||
     pathname.startsWith('/api/auth') ||
     pathname.startsWith('/api/newsletter') ||

@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { registerSchema } from '@/lib/validators';
+import { sendWelcomeEmail } from '@/lib/email';
 
 export async function POST(request) {
   try {
@@ -24,6 +25,9 @@ export async function POST(request) {
     await prisma.user.create({
       data: { name, email, passwordHash, role: 'CUSTOMER' },
     });
+
+    // Fire-and-forget welcome email (must not block/fail registration).
+    sendWelcomeEmail(email, name).catch(() => {});
 
     return Response.json({ ok: true }, { status: 201 });
   } catch (err) {

@@ -1,5 +1,6 @@
 import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
+import { sendOrderConfirmationEmail } from '@/lib/email';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-04-10' });
 
@@ -76,4 +77,8 @@ async function fulfillOrder(orderId, session) {
       });
     }
   });
+
+  // Order confirmation email (fire-and-forget; never block the webhook).
+  const confirmEmail = session.customer_details?.email || order.email;
+  sendOrderConfirmationEmail(confirmEmail, { ...order, email: confirmEmail }).catch(() => {});
 }
